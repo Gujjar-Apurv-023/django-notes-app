@@ -1,28 +1,52 @@
+@Library("shared") _
 pipeline {
-    agent any
-    stages{
-        stage("Clone Code"){
+    agent { label "Apurv" }
+
+    stages {
+        stage("Hello"){
             steps{
-                git url: "https://github.com/LondheShubham153/django-notes-app.git", branch: "main"
-            }
-        }
-        stage("Build and Test"){
-            steps{
-                sh "docker build . -t note-app-test-new"
-            }
-        }
-        stage("Push to Docker Hub"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker tag note-app-test-new ${env.dockerHubUser}/note-app-test-new:latest"
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker push ${env.dockerHubUser}/note-app-test-new:latest"
+                script{
+                    hello()
                 }
             }
         }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
+
+        stage("Code") {
+            steps {
+               script{
+                 gitCheckout(
+                    "https://github.com/Gujjar-Apurv-023/django-notes-app.git",
+                    "dev"
+                 )
+                 echo "Code cloned successfully"
+                }
+            }
+        }
+
+        stage("Build") {
+            steps {
+                script{
+                docker_build("notes-app","latest","apurv023")
+                echo "Build successful"
+                }
+            }
+        }
+
+        stage("Push Image to Docker Hub") {
+            steps {
+                script{
+                    docker_push("notes-app","latest","apurv023")
+                }
+            }
+        }
+
+        stage("Deploy") {
+            steps {
+                sh 'docker compose up -d'
+                echo "Deployment successful"
+                sh "docker ps"
+                echo "successful visible running container"
+                echo "done"
             }
         }
     }
