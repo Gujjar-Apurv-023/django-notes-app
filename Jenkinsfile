@@ -36,6 +36,7 @@ pipeline {
             steps {
                 script{
                     docker_push("notes-app","latest","apurv023")
+                    echo " image push on dockerhub successfully "
                 }
             }
         }
