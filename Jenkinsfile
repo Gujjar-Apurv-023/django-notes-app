@@ -42,7 +42,7 @@ pipeline {
 
         stage("Deploy") {
             steps {
-                sh 'docker compose up -d'
+                sh 'docker compose down && docker compose up -d'
                 echo "Deployment successful"
                 sh "docker ps"
                 echo "successful visible running container"
